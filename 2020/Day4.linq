@@ -6,12 +6,7 @@
 
 async Task Main()
 {
-	var input = (await File.ReadAllTextAsync(@"C:\Repos\GH\AdventOfCode\2020\Day4Input.txt").ConfigureAwait(false))
-				.Split(Environment.NewLine + Environment.NewLine);
-
-	var requiredFields = new[] { "byr:", "iyr:", "eyr:", "hgt:", "hcl:", "ecl:", "pid:" };
-
-	input.Count(i => requiredFields.All(f => i.Contains(f))).Dump("Day 4 Part 1");
+	var input = ProcessInput(await File.ReadAllTextAsync(@"C:\Repos\GH\AdventOfCode\2020\Day4Input.txt").ConfigureAwait(false));
 
 	var validator = new Dictionary<string, Func<string, bool>> {
 		{ "byr", x => PassportValidator.IsValidBirthYear(x) },
@@ -23,16 +18,21 @@ async Task Main()
 		{ "pid", x => PassportValidator.IsValidPassportId(x) },
 	};
 
-	var parsedInput = input
-						.Select(s => 
-								s.Split(new[] { ' ', '\n' }, StringSplitOptions.TrimEntries)
-								.ToDictionary(x => x[..3], x => x[4..]));
-								
-	parsedInput
+	input.Count(i => validator.All(v => i.Keys.Contains(v.Key))).Dump("Day 4 Part 1");
+
+	input
 		.Where(i => validator.Keys.All(k => i.Keys.Contains(k)))
 		.Count(i => validator.All(v => i.TryGetValue(v.Key, out var val) && v.Value.Invoke(val)))
 		.Dump("Day 4 Part 2");
 }
+
+public IEnumerable<Dictionary<string, string>> ProcessInput(string input) =>
+	input
+		.Split(Environment.NewLine + Environment.NewLine)
+		.Select(s =>
+			s.Split(new[] { ' ', '\n' }, StringSplitOptions.TrimEntries)
+			.ToDictionary(x => x[..3], x => x[4..])
+		);
 
 public static class PassportValidator
 {

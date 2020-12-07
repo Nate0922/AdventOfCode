@@ -22,7 +22,7 @@ async Task Main()
 
 	input
 		.Where(i => validator.Keys.All(k => i.Keys.Contains(k)))
-		.Count(i => validator.All(v => i.TryGetValue(v.Key, out var val) && v.Value.Invoke(val)))
+		.Count(i => validator.All(v => i.TryGetValue(v.Key, out string val) && v.Value.Invoke(val)))
 		.Dump("Day 4 Part 2");
 }
 
@@ -36,28 +36,45 @@ public IEnumerable<Dictionary<string, string>> ProcessInput(string input) =>
 
 public static class PassportValidator
 {
-	public static bool IsValidBirthYear(string birthYear) => int.TryParse(birthYear, out int year) && year >= 1920 && year <= 2002;
+	public static bool IsValidBirthYear(string birthYear) => 
+		int.TryParse(birthYear, out int year) 
+		&& year >= 1920 
+		&& year <= 2002;
 
-	public static bool IsValidIssueYear(string issueYear) => int.TryParse(issueYear, out int year) && year >= 2010 && year <= 2020;
+	public static bool IsValidIssueYear(string issueYear) => 
+		int.TryParse(issueYear, out int year) 
+		&& year >= 2010 
+		&& year <= 2020;
 
-	public static bool IsValidExpirationYear(string expirationYear) => int.TryParse(expirationYear, out int year) && year >= 2020 && year <= 2030;
+	public static bool IsValidExpirationYear(string expirationYear) => 
+		int.TryParse(expirationYear, out int year) 
+		&& year >= 2020 
+		&& year <= 2030;
 
 	public static bool IsValidHeight(string height)
 	{
-
-		if (height.EndsWith("cm") && int.TryParse(height[..3], out int cms) && cms >= 150 && cms <= 193)
+		if (height.EndsWith("cm") 
+			&& int.TryParse(height[..3], out int cms) 
+			&& cms >= 150 
+			&& cms <= 193)
 			return true;
 
-		if (height.EndsWith("in") && int.TryParse(height[..2], out int inches) && inches >= 59 && inches <= 76)
+		if (height.EndsWith("in") 
+			&& int.TryParse(height[..2], out int inches) 
+			&& inches >= 59 
+			&& inches <= 76)
 			return true;
 
 		return false;
 	}
 
-	public static bool IsValidHairColor(string hairColor) => Regex.IsMatch(hairColor, "^#[0-9a-f]{6}$");
+	public static bool IsValidHairColor(string hairColor) => 
+		Regex.IsMatch(hairColor, "^#[0-9a-f]{6}$");
 
-	private static readonly HashSet<string> validColors = new HashSet<string> { "amb", "blu", "brn", "gry", "grn", "hzl", "oth" };
+	private static readonly HashSet<string> validColors = 
+		new HashSet<string> { "amb", "blu", "brn", "gry", "grn", "hzl", "oth" };
 	public static bool IsValidEyeColor(string eyeColor) => validColors.Contains(eyeColor);
 
-	public static bool IsValidPassportId(string passportId) => passportId.Length == 9 && passportId.All(char.IsDigit);
+	public static bool IsValidPassportId(string passportId) => 
+		passportId.Length == 9 && passportId.All(char.IsDigit);
 }

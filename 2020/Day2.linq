@@ -22,7 +22,7 @@ private static bool IsValidPasswordPart1(int policyMin, int policyMax, char char
 private static bool IsValidPasswordPart2(int policyMin, int policyMax, char character, string password) =>
 	password[policyMin - 1] == character ^ password[policyMax - 1] == character;
 
-private IEnumerable<(int PolicyMin, int PolicyMax, char Character, string Password)> ProcessInput(IEnumerable<string> input)
+private static IEnumerable<(int PolicyMin, int PolicyMax, char Character, string Password)> ProcessInput(IEnumerable<string> input)
 {
 	return input.Select(x =>
 		{

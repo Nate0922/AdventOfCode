@@ -9,11 +9,10 @@ void Main()
 	var FADD = int.Parse(input[0]);
 	var busIds = input[1].Split(',').Where(x => x != "x").Select(int.Parse);
 
-	var nextBusTimes = busIds
+	var nextBusTime = busIds
 				.Select(b => new { Bus = b, NextTime = b * (FADD / b + 1) })
-				.OrderBy(b => b.NextTime);
+				.OrderBy(b => b.NextTime)
+				.First();
 	
-	((nextBusTimes.First().NextTime - FADD) * nextBusTimes.First().Bus).Dump("Day 13 Part 1");
+	((nextBusTime.NextTime - FADD) * nextBusTime.Bus).Dump("Day 13 Part 1");
 }
-
-

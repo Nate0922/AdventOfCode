@@ -44,7 +44,7 @@ void HydrateFileSystem(ElfDirectory root, IList<string> input)
 
         if (int.TryParse(line[0], out int n))
         {
-            currentDirectory.AddFile(new() { Name = line[1], Parent = currentDirectory, Size = n });
+            currentDirectory.AddFile(new() { Name = line[1], Size = n });
             continue;
         }
 
@@ -64,7 +64,6 @@ void HydrateFileSystem(ElfDirectory root, IList<string> input)
 record ElfFile
 {
     public string Name { get; init; }
-    public ElfDirectory Parent { get; init; }
     public int Size { get; init; }
 }
 

@@ -2,69 +2,63 @@
 
 void Main()
 {
-    var input = File.ReadLines(@"C:\Repos\AdventOfCode\2022\Day7Input.txt").Skip(1).ToList();
-
-    ElfDirectory root = new() { Name = "/" };
-    HydrateFileSystem(root, input);
-
+    var input = File.ReadLines(@"C:\Repos\AdventOfCode\2022\Day7Input.txt").Skip(1);
+    ElfDirectory root = HydrateFileSystem(input);
     List<int> directorySizes = new();
+
     Traverse(root, directorySizes);
 
     directorySizes.Where(x => x <= 100_000).Sum().Dump("Day 7 Part 1");
 
     var neededSpace = 30_000_000 - (70_000_000 - root.Size);
-    directorySizes.Order().First(x => x >= neededSpace).Dump("Day 7 Part 2");
+    directorySizes.Where(x => x >= neededSpace).Min().Dump("Day 7 Part 2");
 }
 
-void Traverse(ElfDirectory node, IList<int> sizes)
+void Traverse(ElfDirectory directory, IList<int> sizes)
 {
-    if (node == null) return;
+    if (directory == null) return;
 
-    sizes.Add(node.Size);
+    sizes.Add(directory.Size);
 
-    foreach (var dir in node.SubDirectories)
+    foreach (var sub in directory.SubDirectories)
     {
-        Traverse(dir, sizes);
+        Traverse(sub, sizes);
     }
 }
 
-void HydrateFileSystem(ElfDirectory root, IList<string> input)
+ElfDirectory HydrateFileSystem(IEnumerable<string> input)
 {
+    ElfDirectory root = new() { Name = "/" };
     var currentDirectory = root;
 
-    foreach (var l in input)
+    foreach (var line in input)
     {
-        var line = l.Split(' ');
-
-        if (line[0] == "dir")
+        switch (line.Split(' '))
         {
-            currentDirectory.AddDirectory(new() { Name = line[1], Parent = currentDirectory });
-            continue;
-        }
+            case ["dir", var name]:
+                currentDirectory.AddDirectory(new() { Name = name, Parent = currentDirectory });
+                break;
 
-        if (int.TryParse(line[0], out int n))
-        {
-            currentDirectory.AddFile(new() { Name = line[1], Parent = currentDirectory, Size = n });
-            continue;
-        }
-
-        if (line is ["$", "cd", ..])
-        {
-            if (line[2] == "..")
-            {
+            case ["$", "cd", ".."]:
                 currentDirectory = currentDirectory.Parent;
-                continue;
-            }
+                break;
 
-            currentDirectory = currentDirectory.SubDirectories.Single(x => x.Name == line[2]);
+            case ["$", "cd", var name]:
+                currentDirectory = currentDirectory.SubDirectories.Single(x => x.Name == name);
+                break;
+
+            case [var num, var name]:
+                if (int.TryParse(num, out int n)) currentDirectory.AddFile(new() { Name = name, Size = n });
+                break;
         }
     }
+
+    return root;
 }
 
 record ElfFile
 {
     public string Name { get; init; }
-    public ElfDirectory Parent { get; init; }
     public int Size { get; init; }
 }
 
